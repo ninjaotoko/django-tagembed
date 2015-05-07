@@ -34,9 +34,9 @@ class Embed:
         # crea los demás argumentos con los que se crean los patrones para capturar
         # usa el key como label de captura y el val para la regexp
         for key, patt in self.arguments.iteritems():
-            pattern = "%s (?P<%s>%s+)" % (pattern, key, patt)
+            pattern = "%s\s*(?P<%s>%s+)" % (pattern, key, patt)
 
-        pattern = "%s (?P<attrs>[^]]*)" % pattern
+        pattern = "%s\s*(?P<attrs>[^]]*)" % pattern
 
         return re.compile(pattern.join(self.tag_wrapper), re.I | re.M | re.U)
 
