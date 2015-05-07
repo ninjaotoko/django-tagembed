@@ -21,7 +21,7 @@ class Embed:
         devuelve una RegExp
         re.sub(
             # pattern
-            "\[(?P<tag>[a-z]+)\s+(?P<id>[0-9]+)\s?(?P<attrs>[^]]*)\]", "<\\1 id=\\2 \\3/>", 
+            "\[(?P<tag>[a-z]+)\s+(?P<id>[0-9]+)\s*(?P<attrs>[^]]*)\]", "<\\1 id=\\2 \\3/>", 
             # text
             "Este video es [ted 2143 class='large'] y el >>>> otro [vimeo 734]", 
             # flags
