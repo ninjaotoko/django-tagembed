@@ -34,7 +34,10 @@ class Embed:
         # crea los demás argumentos con los que se crean los patrones para capturar
         # usa el key como label de captura y el val para la regexp
         for key, patt in self.arguments.iteritems():
-            pattern = "%s\s*(?P<%s>%s+)" % (pattern, key, patt)
+            if key.endswith('?'):
+                pattern = "%(pattern)s\s*(%(key)s=(?P<%(key)s>%(patt)s+))?" % dict(pattern=pattern, key=key.replace('?', ''), patt=patt)
+            else:
+                pattern = "%(pattern)s\s*%(key)s=(?P<%(key)s>%(patt)s+)" % dict(pattern=pattern, key=key, patt=patt)
 
         pattern = "%s\s*(?P<attrs>[^]]*)" % pattern
 
@@ -95,6 +98,13 @@ class TedxEmbed(Embed):
     """
 
     tag = "ted"
+    tag_class_wrapper = "flex-video"
+
+    arguments = {
+        "id": "[a-zA-Z0-9\-\_]", # argumento obligatorio, los demás son tratados como attributos
+        "lang?": "[a-zA-Z\-]", # termina en ? es opcional
+        #"wrapp_class?": "\"[a-zA-Z\-\_\s]\"", # termina en ? es opcional
+    }
 
     def resolver(self, match):
         """
@@ -107,10 +117,12 @@ class TedxEmbed(Embed):
 
         if args.get('url'):
             url = args.get('url')
+            #https://www.ted.com/talks/louise_fresco_on_feeding_the_whole_world?language=es
 
         elif args.get('id'):
             id = args.get('id')
-            url = "http://www.ted.com/talks/view/id/%s" % id
+            lang = args.get('lang') or 'es'
+            url = "http://www.ted.com/talks/view/lang/%(lang)s/id/%(id)s" % dict(id=id, lang=lang)
 
         url_embed = "http://www.ted.com/services/v1/oembed.json?url=%s" % url
         embed = requests.get(url_embed)
@@ -121,7 +133,10 @@ class TedxEmbed(Embed):
             except:
                 pass
 
-        return self.html_element
+        tag_class_wrapper = args.get('wrapp_class') or self.tag_class_wrapper
+
+        return "<div class=\"%(tag_class_wrapper)s\">%(html)s</div>" % dict(html=self.html_element, \
+                tag_class_wrapper=tag_class_wrapper)
 
 
 
@@ -131,6 +146,7 @@ class YoutubeEmbed(Embed):
     """
 
     tag = "youtube"
+    tag_class_wrapper = "flex-video"
 
     def resolver(self, match):
         """
@@ -156,4 +172,7 @@ class YoutubeEmbed(Embed):
             except:
                 pass
 
-        return self.html_element
+        tag_class_wrapper = args.get('wrapp_class') or self.tag_class_wrapper
+
+        return "<div class=\"%(tag_class_wrapper)s\">%(html)s</div>" % dict(html=self.html_element, \
+                tag_class_wrapper=tag_class_wrapper)
