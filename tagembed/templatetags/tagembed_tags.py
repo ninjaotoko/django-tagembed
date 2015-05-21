@@ -2,7 +2,8 @@
 
 from django import template
 from django.utils.safestring import mark_safe
-from tagembed.tagembed import TedxEmbed, YoutubeEmbed
+from tagembed.providers.tedx import TedxEmbed
+from tagembed.providers.youtube import YoutubeEmbed
 
 register = template.Library()
 
